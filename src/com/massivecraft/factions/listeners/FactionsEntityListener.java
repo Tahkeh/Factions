@@ -603,7 +603,7 @@ public class FactionsEntityListener implements Listener
 		boolean itemframe = event.getEntity() instanceof ItemFrame;
 		if (event.isCancelled()) return;
 
-		if ( ! FactionsBlockListener.playerCanBuildDestroyBlock(event.getPlayer(), event.getBlock().getLocation(), itemframe ? "remove item frames" : "remove paintings", false) )
+		if ( ! FactionsBlockListener.playerCanBuildDestroyBlock(event.getPlayer(), event.getBlock().getLocation(), itemframe ? "place item frames" : "place paintings", false) )
 		{
 			event.setCancelled(true);
 		}
