@@ -168,6 +168,7 @@ public class FactionsEntityListener implements Listener
 		}
 		else if
 		(
+			// it's a bit crude just using fireball protection for Wither boss too, but I'd rather not add in a whole new set of xxxBlockWitherExplosion or whatever
 			(boomer instanceof Fireball || boomer instanceof WitherSkull || boomer instanceof Wither)
 			&&
 			(
@@ -243,7 +244,8 @@ public class FactionsEntityListener implements Listener
 
 	private static final Set<PotionEffectType> badPotionEffects = new LinkedHashSet<PotionEffectType>(Arrays.asList(
 		PotionEffectType.BLINDNESS, PotionEffectType.CONFUSION, PotionEffectType.HARM, PotionEffectType.HUNGER,
-		PotionEffectType.POISON, PotionEffectType.SLOW, PotionEffectType.SLOW_DIGGING, PotionEffectType.WEAKNESS
+		PotionEffectType.POISON, PotionEffectType.SLOW, PotionEffectType.SLOW_DIGGING, PotionEffectType.WEAKNESS,
+		PotionEffectType.WITHER
 	));
 
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -538,44 +540,30 @@ public class FactionsEntityListener implements Listener
 			
 			if
 			(
-					(faction.isNone() && Conf.wildernessBlockCreepers && !Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName()))
-					||
-					(faction.isNormal() && (online ? Conf.territoryBlockCreepers : Conf.territoryBlockCreepersWhenOffline))
-					||
-					(faction.isWarZone() && Conf.warZoneBlockCreepers)
-					||
-					faction.isSafeZone()
+				(
+					faction.isNone()
+					&& !Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName())
+					&& (Conf.wildernessBlockCreepers || Conf.wildernessBlockFireballs || Conf.wildernessBlockTNT)
+				)
+				||
+				(
+					faction.isNormal()
+					&&
+					( online
+						? (Conf.territoryBlockCreepers || Conf.territoryBlockFireballs || Conf.territoryBlockTNT)
+						: (Conf.territoryBlockCreepersWhenOffline || Conf.territoryBlockFireballsWhenOffline || Conf.territoryBlockTNTWhenOffline)
+					)
+				)
+				||
+				(
+					faction.isWarZone()
+					&& (Conf.warZoneBlockCreepers || Conf.warZoneBlockFireballs || Conf.warZoneBlockTNT)
+				)
+				||
+				faction.isSafeZone()
 			)
 			{
-				// creeper which needs prevention
-				event.setCancelled(true);
-			}
-			else if
-			(
-					(faction.isNone() && Conf.wildernessBlockFireballs && !Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName()))
-					||
-					(faction.isNormal() && (online ? Conf.territoryBlockFireballs : Conf.territoryBlockFireballsWhenOffline))
-					||
-					(faction.isWarZone() && Conf.warZoneBlockFireballs)
-					||
-					faction.isSafeZone()
-			)
-			{
-				// ghast fireball which needs prevention
-				event.setCancelled(true);
-			}
-			else if
-			(
-					(faction.isNone() && Conf.wildernessBlockTNT && ! Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName()))
-					||
-					(faction.isNormal() && ( online ? Conf.territoryBlockTNT : Conf.territoryBlockTNTWhenOffline ))
-					||
-					(faction.isWarZone() && Conf.warZoneBlockTNT)
-					||
-					(faction.isSafeZone() && Conf.safeZoneBlockTNT)
-			)
-			{
-				// TNT which needs prevention
+				// explosion which needs prevention
 				event.setCancelled(true);
 			}
 		}
@@ -614,12 +602,33 @@ public class FactionsEntityListener implements Listener
 	{
 		if (event.isCancelled()) return;
 
-		// for now, only interested in Enderman tomfoolery
-		if (!(event.getEntity() instanceof Enderman)) return;
+		Entity entity = event.getEntity();
 
-		if (stopEndermanBlockManipulation(event.getBlock().getLocation()))
+		// for now, only interested in Enderman and Wither boss tomfoolery
+		if (!(entity instanceof Enderman) && !(entity instanceof Wither)) return;
+
+		Location loc = event.getBlock().getLocation();
+
+		if (entity instanceof Enderman)
 		{
-			event.setCancelled(true);
+			if (stopEndermanBlockManipulation(loc))
+				event.setCancelled(true);
+		}
+		else if (entity instanceof Wither)
+		{
+			Faction faction = Board.getFactionAt(new FLocation(loc));
+			// it's a bit crude just using fireball protection, but I'd rather not add in a whole new set of xxxBlockWitherExplosion or whatever
+			if
+			(
+				(faction.isNone() && Conf.wildernessBlockFireballs && !Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName()))
+				||
+				(faction.isNormal() && (faction.hasPlayersOnline() ? Conf.territoryBlockFireballs : Conf.territoryBlockFireballsWhenOffline))
+				||
+				(faction.isWarZone() && Conf.warZoneBlockFireballs)
+				||
+				faction.isSafeZone()
+			)
+				event.setCancelled(true);
 		}
 	}
 
