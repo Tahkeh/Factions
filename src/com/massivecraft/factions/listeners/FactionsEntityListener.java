@@ -15,6 +15,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
@@ -208,7 +209,8 @@ public class FactionsEntityListener implements Listener
 		}
 		else if
 		(
-			boomer instanceof TNTPrimed
+			// Added TNT Minecarts to the territory TNT protection
+			(boomer instanceof TNTPrimed || boomer instanceof ExplosiveMinecart)
 			&&
 			(
 				(faction.isNone() && Conf.wildernessBlockTNT && ! Conf.worldsNoWildernessProtection.contains(loc.getWorld().getName()))
