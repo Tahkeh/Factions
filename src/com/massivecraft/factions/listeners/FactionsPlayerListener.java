@@ -308,6 +308,10 @@ public class FactionsPlayerListener implements Listener
 
 		if (otherFaction.isNone())
 		{
+			// Temporary fix to prevent Hopper Minecarts from being placed in the wilderness
+			if (Conf.wildernessBlockHopperCart && player.getItemInHand().getType() == Material.HOPPER_MINECART)
+				return false;
+			
 			if (!Conf.wildernessDenyUseage || Conf.worldsNoWildernessProtection.contains(location.getWorld().getName()))
 				return true; // This is not faction territory. Use whatever you like here.
 			

@@ -191,6 +191,7 @@ public class Conf
 	public static boolean wildernessBlockCreepers = false;
 	public static boolean wildernessBlockFireballs = false;
 	public static boolean wildernessBlockTNT = false;
+	public static boolean wildernessBlockHopperCart = true;
 	public static boolean wildernessPowerLoss = true;
 	public static boolean wildernessDenyEndermanBlocks = false;
 
