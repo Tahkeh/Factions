@@ -29,6 +29,7 @@ import com.massivecraft.factions.listeners.FactionsEntityListener;
 import com.massivecraft.factions.listeners.FactionsExploitListener;
 import com.massivecraft.factions.listeners.FactionsPlayerListener;
 import com.massivecraft.factions.listeners.FactionsServerListener;
+import com.massivecraft.factions.listeners.FactionsVehicleListener;
 import com.massivecraft.factions.struct.ChatMode;
 import com.massivecraft.factions.util.AutoLeaveTask;
 import com.massivecraft.factions.util.LazyLocation;
@@ -54,6 +55,7 @@ public class P extends MPlugin
 	public final FactionsExploitListener exploitListener;
 	public final FactionsBlockListener blockListener;
 	public final FactionsServerListener serverListener;
+	public final FactionsVehicleListener vehicleListener;
 	
 	// Persistance related
 	private boolean locked = false;
@@ -74,6 +76,7 @@ public class P extends MPlugin
 		this.exploitListener = new FactionsExploitListener();
 		this.blockListener = new FactionsBlockListener(this);
 		this.serverListener = new FactionsServerListener(this);
+		this.vehicleListener = new FactionsVehicleListener(this);
 	}
 
 
@@ -127,6 +130,7 @@ public class P extends MPlugin
 		getServer().getPluginManager().registerEvents(exploitListener, this);
 		getServer().getPluginManager().registerEvents(blockListener, this);
 		getServer().getPluginManager().registerEvents(serverListener, this);
+		getServer().getPluginManager().registerEvents(vehicleListener, this);
 
 		// since some other plugins execute commands directly through this command interface, provide it
 		this.getCommand(this.refCommand).setExecutor(this);

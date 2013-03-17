@@ -40,6 +40,7 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.hanging.HangingBreakEvent.RemoveCause;
 import org.bukkit.event.hanging.HangingPlaceEvent;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -167,7 +168,18 @@ public class FactionsEntityListener implements Listener
 			event.setCancelled(true);
 			return;
 		}
-
+		if (boomer instanceof ExplosiveMinecart && boomer.hasMetadata("placedInFaction")) {
+			MetadataValue fid = null;
+			for (MetadataValue meta : boomer.getMetadata("placedInFaction")) {
+				if (meta.getOwningPlugin() == p) {
+					fid = meta;
+				}
+			}
+			if (!faction.getId().equals(fid.asString())) {
+				event.setCancelled(true);
+			}
+		}
+		
 		boolean online = faction.hasPlayersOnline();
 
 		if
