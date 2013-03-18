@@ -168,6 +168,7 @@ public class FactionsEntityListener implements Listener
 			event.setCancelled(true);
 			return;
 		}
+		
 		if (boomer instanceof ExplosiveMinecart && boomer.hasMetadata("placedInFaction")) {
 			MetadataValue fid = null;
 			for (MetadataValue meta : boomer.getMetadata("placedInFaction")) {
@@ -177,6 +178,7 @@ public class FactionsEntityListener implements Listener
 			}
 			if (!faction.getId().equals(fid.asString())) {
 				event.setCancelled(true);
+				return;
 			}
 		}
 		
