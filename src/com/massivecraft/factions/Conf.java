@@ -71,8 +71,11 @@ public class Conf
 
 	public static boolean broadcastDescriptionChanges = false;
 
+	public static double saveToFileEveryXMinutes = 30.0;
+
 	public static double autoLeaveAfterDaysOfInactivity = 10.0;
 	public static double autoLeaveRoutineRunsEveryXMinutes = 5.0;
+	public static int autoLeaveRoutineMaxMillisecondsPerTick = 5;  // 1 server tick is roughly 50ms, so default max 10% of a tick
 	public static boolean removePlayerDataWhenBanned = true;
 
 	public static boolean worldGuardChecking = false;
@@ -314,6 +317,9 @@ public class Conf
 		territoryProtectedMaterials.add(Material.SOIL);
 		territoryProtectedMaterials.add(Material.BEACON);
 		territoryProtectedMaterials.add(Material.ANVIL);
+		territoryProtectedMaterials.add(Material.TRAPPED_CHEST);
+		territoryProtectedMaterials.add(Material.DROPPER);
+		territoryProtectedMaterials.add(Material.HOPPER);
 
 		territoryDenyUseageMaterials.add(Material.FIREBALL);
 		territoryDenyUseageMaterials.add(Material.FLINT_AND_STEEL);
@@ -337,6 +343,9 @@ public class Conf
 		territoryProtectedMaterialsWhenOffline.add(Material.SOIL);
 		territoryProtectedMaterialsWhenOffline.add(Material.BEACON);
 		territoryProtectedMaterialsWhenOffline.add(Material.ANVIL);
+		territoryProtectedMaterialsWhenOffline.add(Material.TRAPPED_CHEST);
+		territoryProtectedMaterialsWhenOffline.add(Material.DROPPER);
+		territoryProtectedMaterialsWhenOffline.add(Material.HOPPER);
 
 		territoryDenyUseageMaterialsWhenOffline.add(Material.FIREBALL);
 		territoryDenyUseageMaterialsWhenOffline.add(Material.FLINT_AND_STEEL);

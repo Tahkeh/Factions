@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.com.google.gson.Gson;
-import org.bukkit.craftbukkit.libs.com.google.gson.JsonSyntaxException;
 import com.massivecraft.factions.zcore.util.DiscUtil;
 import com.massivecraft.factions.zcore.util.TextUtil;
 
@@ -173,9 +172,15 @@ public abstract class EntityCollection<E extends Entity>
 	// -------------------------------------------- //
 	// DISC
 	// -------------------------------------------- //
-	
+
+	// we don't want to let saveToDisc() run multiple iterations simultaneously
+	private boolean saveIsRunning = false;
+
 	public boolean saveToDisc()
 	{
+		if (saveIsRunning) return true;
+		saveIsRunning = true;
+
 		Map<String, E> entitiesThatShouldBeSaved = new HashMap<String, E>();
 		for (E entity : this.entities)
 		{
@@ -184,7 +189,8 @@ public abstract class EntityCollection<E extends Entity>
 				entitiesThatShouldBeSaved.put(entity.getId(), entity);
 			}
 		}
-		
+
+		saveIsRunning = false;
 		return this.saveCore(entitiesThatShouldBeSaved);
 	}
 	
@@ -223,7 +229,7 @@ public abstract class EntityCollection<E extends Entity>
 		{
 			return this.gson.fromJson(content, type);
 		}
-		catch(JsonSyntaxException ex)
+		catch(Exception ex)
 		{
 			Bukkit.getLogger().log(Level.WARNING, "JSON error encountered loading \"" + file + "\": " + ex.getLocalizedMessage());
 

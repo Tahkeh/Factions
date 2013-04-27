@@ -15,10 +15,10 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.minecart.ExplosiveMinecart;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
@@ -181,7 +181,7 @@ public class FactionsEntityListener implements Listener
 				return;
 			}
 		}
-		
+
 		boolean online = faction.hasPlayersOnline();
 
 		if
@@ -223,7 +223,6 @@ public class FactionsEntityListener implements Listener
 		}
 		else if
 		(
-			// Added TNT Minecarts to the territory TNT protection
 			(boomer instanceof TNTPrimed || boomer instanceof ExplosiveMinecart)
 			&&
 			(
@@ -240,7 +239,7 @@ public class FactionsEntityListener implements Listener
 			// TNT which needs prevention
 			event.setCancelled(true);
 		}
-		else if (boomer instanceof TNTPrimed && Conf.handleExploitTNTWaterlog)
+		else if ((boomer instanceof TNTPrimed || boomer instanceof ExplosiveMinecart) && Conf.handleExploitTNTWaterlog)
 		{
 			// TNT in water/lava doesn't normally destroy any surrounding blocks, which is usually desired behavior, but...
 			// this change below provides workaround for waterwalling providing perfect protection,
@@ -560,7 +559,6 @@ public class FactionsEntityListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPaintingBreak(HangingBreakEvent event)
 	{
-		boolean itemframe = event.getEntity() instanceof ItemFrame;
 		if (event.isCancelled()) return;
 		if (event.getCause() == RemoveCause.EXPLOSION)
 		{
@@ -616,6 +614,8 @@ public class FactionsEntityListener implements Listener
 			return;
 		}
 
+		boolean itemframe = event.getEntity() instanceof ItemFrame;
+
 		if ( ! FactionsBlockListener.playerCanBuildDestroyBlock((Player)breaker, event.getEntity().getLocation(), itemframe ? "remove item frames" : "remove paintings", false))
 		{
 			event.setCancelled(true);
@@ -625,8 +625,9 @@ public class FactionsEntityListener implements Listener
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPaintingPlace(HangingPlaceEvent event)
 	{
-		boolean itemframe = event.getEntity() instanceof ItemFrame;
 		if (event.isCancelled()) return;
+
+		boolean itemframe = event.getEntity() instanceof ItemFrame;
 
 		if ( ! FactionsBlockListener.playerCanBuildDestroyBlock(event.getPlayer(), event.getBlock().getLocation(), itemframe ? "place item frames" : "place paintings", false) )
 		{
