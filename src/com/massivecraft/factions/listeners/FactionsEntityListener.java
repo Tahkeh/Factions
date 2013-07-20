@@ -32,6 +32,7 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -337,7 +338,7 @@ public class FactionsEntityListener implements Listener
 	{
 		Entity damager = sub.getDamager();
 		Entity damagee = sub.getEntity();
-		int damage = sub.getDamage();
+		double damage = sub.getDamage();
 		
 		// Edit start
 		boolean playerHit = false;
@@ -560,8 +561,31 @@ public class FactionsEntityListener implements Listener
 	public void onPaintingBreak(HangingBreakEvent event)
 	{
 		if (event.isCancelled()) return;
-		if (event.getCause() == RemoveCause.EXPLOSION)
+
+		// Edit start
+		boolean explosion = event.getCause() == RemoveCause.EXPLOSION;
+
+		// Check for other types of explosions caused by entities
+		if (!explosion && event instanceof HangingBreakByEntityEvent) {
+			Entity breaker = ((HangingBreakByEntityEvent) event).getRemover();
+			EntityDamageEvent cause = event.getEntity().getLastDamageCause();
+
+			// Ignore any damage caused by a player
+			// Avoid case where a frame was damaged by TNT, cancelled, and then a player
+			// tries to hit it to manually remove it. getLastDamageCause() will be set to
+			// *_EXPLOSION and the game will think the player lit TNT, thus canceling the event.
+			if (!(breaker instanceof Player) && cause != null) {
+				DamageCause damageCause = cause.getCause();
+
+				if (damageCause == DamageCause.BLOCK_EXPLOSION || damageCause == DamageCause.ENTITY_EXPLOSION) {
+					explosion = true;
+				}
+			}
+		}
+
+		if (explosion)
 		{
+			// Edit end
 			Location loc = event.getEntity().getLocation();
 			Faction faction = Board.getFactionAt(new FLocation(loc));
 			if (faction.noExplosionsInTerritory())
